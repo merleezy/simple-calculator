@@ -1,2 +1,2 @@
-# simple-calendar
-Simple calendar app with basic functionality and UI
+# simple-calculator
+Simple calculator app with basic functionality and UI
