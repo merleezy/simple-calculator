@@ -88,17 +88,17 @@ function calculate() {
       break;
     case "/":
     case "÷":
-      if (current === 0) {
-        alert("Cannot divide by zero");
-        return;
-      }
       result = prev / current;
       break;
     default:
       return;
   }
 
-  currentValue = result.toString();
+  currentValue = String(parseFloat(result.toFixed(10)));
+
+  if (currentValue.replace("-", "").replace(".", "").length > 17) {
+    currentValue = parseFloat(result).toExponential(6);
+  }
 }
 
 function updateDisplay() {
