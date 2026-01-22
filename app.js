@@ -32,7 +32,7 @@ grid.addEventListener("click", (e) => {
 });
 
 function handleNumber(num) {
-  const MAX_LENGTH = 15;
+  const MAX_LENGTH = 14;
 
   if (num === ".") {
     if (currentValue.includes(".")) return;
@@ -65,13 +65,17 @@ function executeCalculation() {
   previousValue = "";
 }
 
+function skipTrailingDecimal(value) {
+  return value.endsWith(".") ? value.slice(0, -1) : value;
+}
+
 function chainOperation(nextOp) {
   if (previousValue && operator) {
     calculate();
   }
 
   if (currentValue !== "0" || previousValue === "") {
-    previousValue = currentValue;
+    previousValue = skipTrailingDecimal(currentValue);
     currentValue = "0";
   }
 
@@ -104,18 +108,44 @@ function calculate() {
       return;
   }
 
-  currentValue = String(parseFloat(result.toFixed(10)));
+  currentValue = String(result);
+}
 
-  // Convert to exponential if too long
-  if (currentValue.replace("-", "").replace(".", "").length > 17) {
-    currentValue = parseFloat(result).toExponential(6);
+function numberToFullString(num) {
+  // Handle very small or very large numbers
+  if (Math.abs(num) < 1e-6 || Math.abs(num) >= 1e14) {
+    // Check if it fits when written out
+    const fixed = num.toFixed(14).replace(/\.?0+$/, "");
+    return fixed;
   }
+
+  // Remove trailing zeros after decimal
+  return parseFloat(num.toPrecision(14)).toString();
+}
+
+function formatForDisplay(value) {
+  const hasTrailingDecimal = value.endsWith(".");
+
+  const trailingDecimalNum = hasTrailingDecimal ? value.slice() : value;
+  const num = parseFloat(value);
+
+  // Force full decimal notation
+  const fullValue = numberToFullString(num);
+  const digits = fullValue.replace("-", "").replace(".", "");
+
+  if (digits.length > 14) {
+    return num.toExponential(8);
+  }
+
+  return hasTrailingDecimal ? trailingDecimalNum : fullValue;
 }
 
 function updateDisplay() {
-  answerScreen.textContent = currentValue;
+  answerScreen.textContent = formatForDisplay(currentValue);
   currentInput.textContent =
-    previousValue && operator ? `${previousValue} ${operator}` : "";
+    previousValue && operator
+      ? `${formatForDisplay(previousValue)} ${operator}`
+      : "";
 }
 
 function clear() {
