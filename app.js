@@ -63,8 +63,11 @@ function handleOperator(op) {
     calculate();
   }
 
-  previousValue = currentValue;
-  currentValue = "0";
+  if (currentValue !== "0" || previousValue === "") {
+    previousValue = currentValue;
+    currentValue = "0";
+  }
+
   operator = op;
   justCalculated = false;
 }
